@@ -1,0 +1,524 @@
+diff --git a/src/main/java/com/dexcom/vnv/capa/CapaTests.java b/src/main/java/com/dexcom/vnv/capa/CapaTests.java
+index 83148e948..f2f2016ec 100644
+--- a/src/main/java/com/dexcom/vnv/capa/CapaTests.java
++++ b/src/main/java/com/dexcom/vnv/capa/CapaTests.java
+@@ -119,7 +119,7 @@ public void beforeEach() {
+ 	}
+ 
+ 	@AfterEach
+-	public void after() throws Exception {
++	public void after(){
+ 		CgmDeviceUtils.sleepFor(3500);
+ 	}
+ 
+@@ -130,6 +130,7 @@ public void TestUrgentLowGlucoseAlarmAudioLoss(TransmitterProduct txProduct) {
+ 		m_device.setInternet(false);
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertUrgentLow();
+ 		urgentLowGlucoseAlarmPage.setSound(3);
+ 		urgentLowGlucoseAlarmPage.clickOnBackButton();
+@@ -160,11 +161,11 @@ public void TestUrgentLowGlucoseAlarmAudioLoss(TransmitterProduct txProduct) {
+ 	@ParameterizedTest(name = "{0}")
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestUrgentLowSoonGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+-		if (txProduct.equals(TransmitterProduct.Firefly)) { // Not applicable to G6Pro tx
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) { // Not applicable to G6Pro tx
+ 			m_device.setInternet(false);
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnAlert();
+-			if (!txProduct.equals(TransmitterProduct.G6Pro)) {
++			CgmDeviceUtils.sleepFor(500);
+ 				alertsPage.clickOnGeneralAlertUrgentLowSoon();
+ 
+ 				urgentLowSoonAlertPage.setSound(3);
+@@ -194,7 +195,6 @@ public void TestUrgentLowSoonGlucoseAlertAudioLoss(TransmitterProduct txProduct)
+ 					Assert.fail("Urgent Low Soon Glucose Alert Sound is not produced");
+ 				}
+ 			}
+-		}
+ 	}
+ 
+ 	/*This method is used to test High Glucose Alert audio loss when playing sounds from  High Glucose alerts - CAPA-000082*/
+@@ -208,6 +208,7 @@ public void TestHighGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+ 		m_device.setInternet(false);
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertHigh(bundle);
+ 		highGlucoseAlertPage.setSound(3);
+ 		highGlucoseAlertPage.clickOnBackButton();
+@@ -222,7 +223,7 @@ public void TestHighGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+ 		assertThat(glucoseAlertPopupPage.getHighAlertName(), IsEqualIgnoringCase.equalToIgnoringCase(bundle.getString("ALERT_HIGH_GLUCOSE_TITLE")));
+ 		assertThat(glucoseAlertPopupPage.getAlertMessage(), IsEqualIgnoringCase.equalToIgnoringCase(bundle.getString("ALERT_HIGH_GLUCOSE_MESSAGE")));
+ 		glucoseAlertPopupPage.clickOK();
+-		if (txProduct.equals(TransmitterProduct.Orion)) {
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) {
+ 			if (JOptionPane.showConfirmDialog(jOptionPane, "Did you hear High Glucose Alert Sound?", "Audio Loss Test",
+ 					JOptionPane.YES_NO_OPTION) != 0) {
+ 				Assert.fail("High Glucose Alert Sound is not produced");
+@@ -248,6 +249,7 @@ public void TestLowGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+ 		m_device.setInternet(false);
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertLow();
+ 		lowGlucoseAlertPage.setSound(3);
+ 		lowGlucoseAlertPage.clickOnBackButton();
+@@ -262,7 +264,7 @@ public void TestLowGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+ 		assertThat(dashBoardPage.getLowAlertTitle(), IsEqualIgnoringCase.equalToIgnoringCase(bundle.getString("ALERT_LOW_GLUCOSE_TITLE")));
+ 		assertThat(glucoseAlertPopupPage.getAlertMessage(), IsEqualIgnoringCase.equalToIgnoringCase(bundle.getString("ALERT_LOW_GLUCOSE_MESSAGE")));
+ 		glucoseAlertPopupPage.clickOK();
+-		if (txProduct.equals(TransmitterProduct.Orion)) {
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) {
+ 			if (JOptionPane.showConfirmDialog(jOptionPane, "Did you hear Low Glucose Alert Sound?", "Audio Loss Test",
+ 					JOptionPane.YES_NO_OPTION) != 0) {
+ 				Assert.fail("Low Glucose Alert Sound is not produced");
+@@ -280,11 +282,11 @@ public void TestLowGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+ 	@ParameterizedTest(name = "{0}")
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestRiseRateGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+-		if (txProduct.equals(TransmitterProduct.Orion)) { // Rise Rate not applicable to G6Pro transmitters
+-			PageUtils.skipSetupWizard();
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) { // Rise Rate not applicable to G6Pro transmitters
+ 			m_device.setInternet(false);
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnAlert();
++			CgmDeviceUtils.sleepFor(500);
+ 			CgmDeviceUtils.scrollDown(m_driver, bundle.getString("NO_READINGS"));
+ 			alertsPage.clickOnGeneralAlertRiseRate();
+ 			riseRateAlertPage.clickOnRiseRateAlertSwitchOn(bundle);
+@@ -316,10 +318,11 @@ public void TestRiseRateGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+ 	@ParameterizedTest(name = "{0}")
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestFallRateGlucoseAlertAudioLoss(TransmitterProduct txProduct) {
+-		if (txProduct.equals(TransmitterProduct.Orion)) { // Fall Rate not applicable to G6Pro transmitter
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) { // Fall Rate not applicable to G6Pro transmitter
+ 			m_device.setInternet(false);
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnAlert();
++			CgmDeviceUtils.sleepFor(500);
+ 			alertsPage.clickOnGeneralAlertFallRate(bundle);
+ 			fallRateAlertPage.clickOnFallRateAlertSwitchOn(bundle);
+ 			fallRateAlertPage.setSound(3);
+@@ -353,6 +356,7 @@ public void TestSignalLossAlertAudioLoss(TransmitterProduct txProduct) {
+ 		m_device.setInternet(false);
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		CgmDeviceUtils.scrollDown(m_driver, bundle.getString("NO_READINGS"));
+ 		alertsPage.clickOnGeneralAlertSignalLoss();
+ 		signalLossAlertPage.setSound(3);
+@@ -380,6 +384,8 @@ public void TestSignalLossAlertAudioLoss(TransmitterProduct txProduct) {
+ 			if (JOptionPane.showConfirmDialog(jOptionPane, "Did you NOT hear Signal Loss Alert Sound?", "Audio Loss Test", JOptionPane.YES_NO_OPTION) != 0) {
+ 				Assert.fail("Signal Loss Alert Sound is incorrectly produced");
+ 			}
++			JOptionPane.showMessageDialog(jOptionPane, "Go back to the App and Press OK.");
++			CgmDeviceUtils.sleepFor(500);
+ 		}
+ 	}
+ 
+@@ -390,8 +396,12 @@ private void createSignalLoss() {
+ 			m_device.simulateInterval();
+ 			CgmDeviceUtils.sleepFor(3000);
+ 		}else {
+-			JOptionPane.showMessageDialog(jOptionPane, "Press OK and enjoy the wait of 20 minutes.");
+-			CgmDeviceUtils.sleepFor(TimeUnit.MINUTES.toMillis(20));
++			JOptionPane.showMessageDialog(jOptionPane, "Enjoy a 20 minute wait after pressing OK for this message dialog");
++			for(int i = 0; i < 4; i++){
++				CgmDeviceUtils.sleepFor(TimeUnit.MINUTES.toMillis(5));
++				m_driver.getContext();
++			}
++
+ 		}
+ 	}
+ 
+@@ -414,6 +424,7 @@ public void TestHighAlertAudioLoss(TransmitterProduct txProduct) {
+ 		PageUtils.skipSetupWizard();
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertHigh();
+ 		alertsPage.clickOnSound();
+ 		for (int i = 0; i < 100; i++) {
+@@ -435,7 +446,7 @@ public void TestHighAlertAudioLoss(TransmitterProduct txProduct) {
+ 		assertThat(new GlucoseAlertPopupPage(m_driver).getAlertMessage(),
+ 				CoreMatchers.is(bundle.getString("ALERT_HIGH_GLUCOSE_MESSAGE")));
+ 		glucoseAlertPopupPage.clickOK();
+-		if (txProduct.equals(TransmitterProduct.Orion)) {
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) {
+ 			if (JOptionPane.showConfirmDialog(jOptionPane, "Did you hear High Alert Sound?", "Audio Loss Test",
+ 					JOptionPane.YES_NO_OPTION) != 0) {
+ 				Assert.fail("High Alert Sound is not produced");
+@@ -459,6 +470,7 @@ public void TestUrgentLowAlertAudioLoss (TransmitterProduct txProduct)
+ 		PageUtils.skipSetupWizard();
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertUrgentLow();
+ 		alertsPage.clickOnSound();
+ 		for (int i = 0; i < 100; i++) {
+@@ -495,6 +507,7 @@ public void TestLowAlertAudioLoss(TransmitterProduct txProduct)
+ 		transmitterSim.startSessionOnTx();
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertLow();
+ 		alertsPage.clickOnSound();
+ 		for (int i = 0; i < 100; i++) {
+@@ -510,7 +523,7 @@ public void TestLowAlertAudioLoss(TransmitterProduct txProduct)
+ 		CgmDeviceUtils.sleepFor(10000);
+ 		assertThat(glucoseAlertPopupPage.getAlertName(), CoreMatchers.is(bundle.getString("ALERT_LOW_GLUCOSE_TITLE")));
+ 		glucoseAlertPopupPage.clickOK();
+-		if (txProduct.equals(TransmitterProduct.Orion)) {
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) {
+ 			if (JOptionPane.showConfirmDialog(jOptionPane, "Did you hear Low Alert Sound?", "Audio Loss Test", JOptionPane.YES_NO_OPTION) != 0) {
+ 				Assert.fail("Low Alert Sound is not produced");
+ 			}
+@@ -529,10 +542,11 @@ public void TestLowAlertAudioLoss(TransmitterProduct txProduct)
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestUrgentLowSoonAudioLoss (TransmitterProduct txProduct)
+ 	{
+-		if (txProduct.equals(TransmitterProduct.Orion)) { // Not applicable to G6Pro transmitter as it does not have Urgent Low Soon
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) { // Not applicable to G6Pro transmitter as it does not have Urgent Low Soon
+ 			PageUtils.skipSetupWizard();
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnAlert();
++			CgmDeviceUtils.sleepFor(500);
+ 			alertsPage.clickOnGeneralAlertUrgentLowSoon();
+ 			alertsPage.clickOnSound();
+ 			for (int i = 0; i < 100; i++) {
+@@ -563,6 +577,7 @@ public void TestSignalLossAudioLoss (TransmitterProduct txProduct) {
+ 		PageUtils.skipSetupWizard();
+ 		dashBoardPage.clickOnSettings();
+ 		settingsPage.clickOnAlert();
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsPage.clickOnGeneralAlertSignalLoss();
+ 		alertsPage.clickOnSound();
+ 		for (int i = 0; i < 100; i++) {
+@@ -600,10 +615,11 @@ public void TestSignalLossAudioLoss (TransmitterProduct txProduct) {
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestAlertFallRateAudioLoss(TransmitterProduct txProduct)
+ 	{
+-		if (txProduct.equals(TransmitterProduct.Orion)) { // Not applicable to G6Pro
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) { // Not applicable to G6Pro
+ 			PageUtils.skipSetupWizard();
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnAlert();
++			CgmDeviceUtils.sleepFor(500);
+ 			alertsPage.clickOnGeneralAlertFallRate(bundle);
+ 			alertsPage.clickOnSound();
+ 			for (int i = 0; i < 100; i++) {
+@@ -633,11 +649,12 @@ public void TestAlertFallRateAudioLoss(TransmitterProduct txProduct)
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestAlertRiseRateAudioLoss(TransmitterProduct txProduct)
+ 	{
+-		if (txProduct.equals(TransmitterProduct.Orion)) { // Not applicable to G6Pro tx
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) { // Not applicable to G6Pro tx
+ 			PageUtils.skipSetupWizard();
+ 			GlucoseAlertPopupPage popup = new GlucoseAlertPopupPage(m_driver);
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnAlert();
++			CgmDeviceUtils.sleepFor(500);
+ 			alertsPage.clickOnGeneralAlertRiseRate();
+ 			alertsPage.clickOnSound();
+ 			for (int i = 0; i < 100; i++) {
+diff --git a/src/main/java/com/dexcom/vnv/core/PageUtils.java b/src/main/java/com/dexcom/vnv/core/PageUtils.java
+index 9d7355845..cc951c421 100644
+--- a/src/main/java/com/dexcom/vnv/core/PageUtils.java
++++ b/src/main/java/com/dexcom/vnv/core/PageUtils.java
+@@ -1885,7 +1885,7 @@ public static Account login(){
+ 	}
+ 
+ 	//Log ins to the app, returns the account used for log in. - Doesnt Skip Legal Checkbox Page.
+-	public static Account loginWithLegal(){
++	public static Account loginWithLegal(ServerConfiguration serverConfiguration){
+ 		device.resetToOOBE(DeviceState.FreshTestInstall);
+ 		//ACM Screen
+ 		try{
+@@ -1893,10 +1893,9 @@ public static Account loginWithLegal(){
+ 		}catch (Exception ignored) { }
+ 		final Account loginAccount = RandomAccount.accountCAMSRandomizer();
+ 		ServerBuilder.cgmServerBuilder().setAccount(loginAccount).setDeviceType(localConfig.getDeviceType())
+-				.setProduct(Product.G6).setLocale(deviceConfig.getLocale()).create();
++				.setProduct(Product.G6).setConfig(serverConfiguration).setLocale(deviceConfig.getLocale()).create();
+ 		warningPage.clickOnContinueToAppButton();
+ 		device.login(loginAccount);
+-		CgmDeviceUtils.sleepFor(5000);
+ 		return loginAccount;
+ 	}
+ 
+diff --git a/src/main/java/com/dexcom/vnv/pageObjects/SettingsPage.java b/src/main/java/com/dexcom/vnv/pageObjects/SettingsPage.java
+index 201cc23da..0064f23de 100644
+--- a/src/main/java/com/dexcom/vnv/pageObjects/SettingsPage.java
++++ b/src/main/java/com/dexcom/vnv/pageObjects/SettingsPage.java
+@@ -356,6 +356,7 @@ public String getSettingsPageTitle(){
+ 	}
+ 
+ 	public void clickOnAlert(){
++		CgmDeviceUtils.sleepFor(500);
+ 		alertsArrow.click();
+ 	}
+ 
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/CalibrationEntryTest_Auto.java b/src/main/java/com/dexcom/vnv/tests/ui/CalibrationEntryTest_Auto.java
+index c36f600a0..443766c00 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/CalibrationEntryTest_Auto.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/CalibrationEntryTest_Auto.java
+@@ -1020,7 +1020,7 @@ public void TestOutOfRangeCalibration(TransmitterProduct txProduct)
+ 		//Calibrate when out of bluetooth range
+ 		m_device.commandAccelerateTime(6000);
+ 		//serverProxy.accelerateTime(6000);
+-		TransmitterUtils.accelerateTransmitter(6000);
++		transmitterSim.addSeconds(6000);
+ 
+ 		m_device.simulateInterval();
+ 
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/CustomerSupportTest_Auto.java b/src/main/java/com/dexcom/vnv/tests/ui/CustomerSupportTest_Auto.java
+index 38313b73c..340a5b00d 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/CustomerSupportTest_Auto.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/CustomerSupportTest_Auto.java
+@@ -140,7 +140,7 @@ public void TestFeedbackForm(TransmitterProduct txProduct){
+ 		PageUtils.skipSetupWizard(txProduct);
+ 		dashBoardPage.clickOnSettings();
+ 		CgmDeviceUtils.sleepFor(2000);
+-		if(txProduct.equals(TransmitterProduct.Firefly)){
++		if(!txProduct.equals(TransmitterProduct.G6Pro)){
+ 			try {
+ 				CgmDeviceUtils.scrollDown(driver, bundle.getString("SETTINGS_PAGE_FEEDBACK"));
+ 			}catch (Exception ignored){/*Scrolls sometimes fail in LG G7*/}
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/HealthDatabaseTest_Manual.java b/src/main/java/com/dexcom/vnv/tests/ui/HealthDatabaseTest_Manual.java
+index 40f85b2e5..f077936a2 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/HealthDatabaseTest_Manual.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/HealthDatabaseTest_Manual.java
+@@ -124,7 +124,7 @@ public static void afterClass() throws Exception
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestGlucoseDataInHealth(TransmitterProduct txProduct)
+ 	{
+-		PageUtils.skipSetupWizard(txProduct);
++		m_device.skipSetupWizard(RandomAccount.randomTransmitterId(txProduct));
+ 		m_device.setInternet(false);
+ 		dashBoardPage.waitForEvents();
+ 
+@@ -170,12 +170,17 @@ public void TestGlucoseDataInHealth(TransmitterProduct txProduct)
+ 			CgmDeviceUtils.setStatus(
+ 					m_device,
+ 					transmitterSimulation,
+-					TimeUnit.HOURS.toSeconds(1),
++					TimeUnit.MINUTES.toSeconds(5),
+ 					DCGMAlgorithmState.InCalibration,
+ 					egvValue,
+ 					(byte)0);
+-		}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
++		}
++
+ 		jOptionPane = new JOptionPane();
++		if (m_device instanceof IosG5Device)
++		{
++			JOptionPane.showMessageDialog(jOptionPane, "Accept Critical Alerts Popup");
++		}
+ 		if (JOptionPane.showConfirmDialog(jOptionPane, "Open Health App. Are the glucose value displayed in the Health App", "Health App Glucose Value", JOptionPane.YES_NO_OPTION) == 0) {
+ 			Assert.fail("Glucose values are added in Health App when it should not");
+ 		}
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/Legal_Manual.java b/src/main/java/com/dexcom/vnv/tests/ui/Legal_Manual.java
+index b820066c6..b700de10e 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/Legal_Manual.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/Legal_Manual.java
+@@ -119,7 +119,8 @@ public static void beforeClass() throws IOException {
+ 	public void before() throws InterruptedException, ExecutionException, IOException{
+ 
+ 		PageUtils.initialize();
+-		PageUtils.loginWithLegal();
++		ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
++		PageUtils.loginWithLegal(serverConfiguration);
+ 		CgmDeviceUtils.sleepFor(1000);
+ 
+ 	}
+@@ -279,7 +280,7 @@ public void TestLegalAgreementChange(TransmitterProduct txProduct) throws Except
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestNoInternet(TransmitterProduct txProduct){
+ 		CgmDeviceUtils.sleepFor(2500);
+-		m_device.runAppInBackground(1);
++//		m_device.runAppInBackground(1);
+ 		final JOptionPane pane = new JOptionPane();
+ 		final String enableAirplaneMode = "Turn on airplane mode, either through the app settings or notification bar,Return to App under test,Click Ok when done";
+ 		pane.requestFocus();
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/SessionControlTest_Auto.java b/src/main/java/com/dexcom/vnv/tests/ui/SessionControlTest_Auto.java
+index bd868fdcd..0d5029160 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/SessionControlTest_Auto.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/SessionControlTest_Auto.java
+@@ -139,13 +139,8 @@ private void enterSensorCode()
+ 		setUpWizardEnterSensorCodePage.setSensorCodeValue(validCode);
+ 		setUpWizardEnterSensorCodePage.clickOnSaveButton();
+ 		setUpWizardEnterSensorCodePage.clickOnConfirmSensorCode();
+-		if (driver instanceof IOSDriver)
+-		{ // Because skip wizard doesn't set flag to true to skip this part
+-			CgmDeviceUtils.sleepFor(3000);
+-			setUpWizardSensortransmitterpage.clickOnStartVideoButon();
+-			videosPage.clickOnvideoPlayScreenDoneButton();
+-		}
+ 		setUpWizardSensortransmitterpage.clickOnSkipVideoLink();
++		CgmDeviceUtils.sleepFor(3000);
+ 		if (driver instanceof AndroidDriver)
+ 			m_device.runAppInBackground(1);
+ 
+@@ -337,7 +332,7 @@ public void TestStartStopSessionStress(TransmitterProduct txProduct)
+ 				SpecialGlucoseValues.SensorNotActive, (byte) Double.NaN);
+ 		m_device.refreshScreen();
+ 
+-		if (m_device.getTransmitterId().startsWith("8"))
++		if (!txProduct.equals(TransmitterProduct.G6Pro))
+ 		{
+ 			if (m_device instanceof IosG5Device) {
+ 				dashBoardPage.clickOnAlertOKButton();
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/AlertSettingsReset_Manual.java b/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/AlertSettingsReset_Manual.java
+index 0a3c56982..e4c99b711 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/AlertSettingsReset_Manual.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/AlertSettingsReset_Manual.java
+@@ -129,7 +129,6 @@ public void TestAlertSettingsReset_IOS(TransmitterProduct txProduct) {
+ 			TransmitterSimulation transmitterSim = CgmDeviceUtils.getTransmitterSimulation(1, txProduct, m_device);
+ 			m_device.setInternet(false);
+ 			dashboardPage.clickOnSettings();
+-			CgmDeviceUtils.sleepFor(500);
+ 			settingsPage.clickOnAlert();
+ 			CgmDeviceUtils.sleepFor(500);
+ 			CgmDeviceUtils.scrollDown(driver, bundle.getString("RESET_ALERT_SETTINGS"));
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/TransmitterPairingAlert_iOS_Manual.java b/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/TransmitterPairingAlert_iOS_Manual.java
+index 6d647c5ae..2d0e87282 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/TransmitterPairingAlert_iOS_Manual.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/SystemAlert/TransmitterPairingAlert_iOS_Manual.java
+@@ -131,7 +131,7 @@ public void TestTransmitterPairingSound()
+ 	@ArgumentsSource(TransmitterArguments.class)
+ 	public void TestTransmitterPairingReAlerting(TransmitterProduct txProduct)
+ 	{
+-		PageUtils.skipSetupWizard(txProduct);
++		m_device.skipSetupWizard(RandomAccount.randomTransmitterId(txProduct));
+ 		dashboardPage.waitForEvents();
+ 		
+ 		JOptionPane.showMessageDialog(pane, "On the phone running the main app, go into settings, transmitter, pair with new, manually enter the transmitter id of a real transmitter you have in a walkabout box");
+@@ -152,7 +152,8 @@ public void TestTransmitterPairingReAlerting(TransmitterProduct txProduct)
+ 		CgmDeviceUtils.sleepFor(TimeUnit.MINUTES.toMillis(5));
+ 		if (JOptionPane.showConfirmDialog(pane, "Did the Transmitter Found Alert reAlert silently?") != 0) {
+ 			Assert.fail("Wrong volume");
+-		}	
++		}
++		JOptionPane.showMessageDialog(pane, "Go back to the App. Once there Hit OK");
+ 	}
+ 
+ 	//Manual
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/TrendTestFixture_Manual.java b/src/main/java/com/dexcom/vnv/tests/ui/TrendTestFixture_Manual.java
+index fb4e6973c..82ef962ca 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/TrendTestFixture_Manual.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/TrendTestFixture_Manual.java
+@@ -7,6 +7,7 @@
+ import com.dexcom.common.G5Device;
+ import com.dexcom.common.G5Device.DeviceState;
+ import com.dexcom.data.cgm.SpecialGlucoseValues;
++import com.dexcom.data.cgm.TrendArrow;
+ import com.dexcom.data.enums.iPhoneAlertTypes;
+ import com.dexcom.ios.IosG5Device;
+ import com.dexcom.proxy.common.ComPairable;
+@@ -93,6 +94,7 @@
+ 	private static WarningPage warningPage;
+ 	private static LowGlucoseAlertPage lowGlucoseAlertPage;
+ 	private static HighGlucoseAlertPage highGlucoseAlertPage;
++	private static SetupWizardCriticalAlertsPage criticalAlertsPage;
+ 	private Account shareAccount;
+ 	private static SetUpWizardEnterSensorCodePage setUpWizardEnterSensorCodePage;
+ 	private static RemovalInstructionsPage removalInstructionsPage;
+@@ -144,7 +146,8 @@ public static void beforeClass() throws IOException
+ 		glucoseAlertPopupPage = new GlucoseAlertPopupPage(driver);
+ 		jOptionPane = new JOptionPane();
+ 		setupWizardInsertSensorNowPage = new SetupWizardInsertSensorNowPage(driver);
+-		actionRequiredPage = new ActionRequiredPage();
++		criticalAlertsPage = new SetupWizardCriticalAlertsPage(driver);
++
+ 	}
+ 
+ 	@BeforeEach
+@@ -645,7 +648,7 @@ public void TestWarmUp(TransmitterProduct txProduct)
+ 				DCGMAlgorithmState.SensorWarmup,
+ 				110,
+ 				(byte)0);
+-		if (device.getTransmitterId().startsWith("8")) {
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) {
+ 			// The 2nd session the message is within the Help button
+ 			dashBoardPage.clickOnSettings();
+ 			settingsPage.clickOnStopSensor(bundle);
+@@ -714,6 +717,7 @@ public void TestNoSession(TransmitterProduct txProduct)
+ 	{
+ 		PageUtils.login();
+ 		device.skipSetupWizard(RandomAccount.randomTransmitterId(txProduct));
++
+ 		device.setInternet(false);
+ 		transmitterSim = CgmDeviceUtils.getTransmitterSimulation(1, txProduct, device);
+ 		transmitterSim.startSessionOnTx();
+@@ -767,14 +771,17 @@ public void TestNoSession(TransmitterProduct txProduct)
+ 	public void TestNotificationsDisabled(TransmitterProduct txProduct) throws InterruptedException, ExecutionException
+ 	{
+ 		device.setInternet(false);
++
++		TransmitterUtils.initialize();
+ 		jOptionPane.requestFocus();
+ 		JOptionPane.showMessageDialog(
+ 				jOptionPane,
+ 				"Navigate to the device settings and turn notifications OFF(if iOS, keep Critical Alerts enabled) for Dexcom App and go back to the App. Press OK when done");
+ 		verifyNotificationMessage();
+-		TransmitterSimulation transmitterSim = CgmDeviceUtils.getTransmitterSimulation(1, txProduct, device);
+-		transmitterSim.startSessionOnTx();
+-		CgmDeviceUtils.setStatus(device,transmitterSim,300,DCGMAlgorithmState.InCalibration,120,(byte)0);
++
++		TransmitterUtils.startNewSession();
++		TransmitterUtils.setStatus(120,300,TrendArrow.None,DCGMAlgorithmState.InCalibration);
++
+ 		if (device instanceof AndroidG5Device) {
+ 			CgmDeviceUtils.sleepFor(5000);
+ 			// https://jira.dexcom.com/browse/ANDM-8638
+@@ -782,16 +789,17 @@ public void TestNotificationsDisabled(TransmitterProduct txProduct) throws Inter
+ 			// https://jira.dexcom.com/browse/ANDM-8642
+ 			verifyLoggingForDisabledNotificationsAndroid(transmitterSim);
+ 		}
+-		device.setInternet(false);
++
+ 		device.commandAccelerateTime(TimeUnit.HOURS.toSeconds(2));
+-		transmitterSim = transmitterSim.addSeconds(TimeUnit.HOURS.toSeconds(2));
+-		CgmDeviceUtils.setStatus(device,transmitterSim,300,DCGMAlgorithmState.InCalibration,120,(byte)0);
++		TransmitterUtils.accelerateTransmitter(TimeUnit.HOURS.toSeconds(2));
++		TransmitterUtils.setStatus(120,300,TrendArrow.None,DCGMAlgorithmState.InCalibration);
++		
+ 		for (int i = 0; i < 3; i++){
+ 			CgmDeviceUtils.sleepFor(2000);
+-			CgmDeviceUtils.setStatus(device,transmitterSim,300,DCGMAlgorithmState.TemporarySensorIssue,SpecialGlucoseValues.PowerAberration,(byte)0);
++			TransmitterUtils.setStatus(SpecialGlucoseValues.PowerAberration,300,TrendArrow.None,DCGMAlgorithmState.TemporarySensorIssue);
+ 		}
+ 		CgmDeviceUtils.sleepFor(2000);
+-		CgmDeviceUtils.setStatus(device,transmitterSim,300,DCGMAlgorithmState.TemporarySensorIssue,SpecialGlucoseValues.PowerAberration,(byte)0);
++		TransmitterUtils.setStatus(SpecialGlucoseValues.PowerAberration,300,TrendArrow.None,DCGMAlgorithmState.TemporarySensorIssue);
+ 		dashBoardPage.clickOnAlertOKButton();
+ 		PageUtils.handleLoginAgainpopup(device);
+ 		CgmDeviceUtils.sleepFor(3000);	 		
+diff --git a/src/main/java/com/dexcom/vnv/tests/ui/iOSWatchAppTest.java b/src/main/java/com/dexcom/vnv/tests/ui/iOSWatchAppTest.java
+index aca069aef..a7454dfb3 100644
+--- a/src/main/java/com/dexcom/vnv/tests/ui/iOSWatchAppTest.java
++++ b/src/main/java/com/dexcom/vnv/tests/ui/iOSWatchAppTest.java
+@@ -13,10 +13,7 @@
+ import com.dexcom.tests.cgm.log.TransmitterArguments;
+ import com.dexcom.tests.cmn.RandomAccount;
+ import com.dexcom.transmittersim.TransmitterSimUtil;
+-import com.dexcom.vnv.core.CgmDeviceUtils;
+-import com.dexcom.vnv.core.CurrentProduct;
+-import com.dexcom.vnv.core.DeviceUtils;
+-import com.dexcom.vnv.core.PageUtils;
++import com.dexcom.vnv.core.*;
+ import io.appium.java_client.AppiumDriver;
+ import io.appium.java_client.MobileElement;
+ import org.junit.Assert;
+@@ -185,7 +182,7 @@ public void TestSystemAlertsOnWatch_iOS(TransmitterProduct txProduct) throws Exc
+ 	public void TestGlucoseAlertsOnWatch_iOS(TransmitterProduct txProduct)
+ 	{
+ 		String ask = "Did a trend graph appear on the watch?";
+-		if (txProduct.equals(TransmitterProduct.Orion)) {
++		if (!txProduct.equals(TransmitterProduct.G6Pro)) {
+ 			JOptionPane.showMessageDialog(pane,
+ 					"Set the txn id in dexcom app as '888888', settings->Transmitter->Pair New->Enter Manually");
+ 		}else {
